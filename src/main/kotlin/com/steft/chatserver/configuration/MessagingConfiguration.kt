@@ -1,21 +1,18 @@
 package com.steft.chatserver.configuration
 
+import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
+import kotlinx.coroutines.reactor.mono
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import reactor.core.publisher.Mono
-import reactor.rabbitmq.RabbitFlux
-import reactor.rabbitmq.Receiver
-import reactor.rabbitmq.ReceiverOptions
-import reactor.rabbitmq.Sender
-import reactor.rabbitmq.SenderOptions
-
+import reactor.rabbitmq.*
 
 @Configuration
 class MessagingConfiguration {
 
-    @Bean("rabbit-connection")
+    @Bean
     fun connectionFactory(): Mono<Connection> =
         ConnectionFactory()
             .apply {
@@ -25,7 +22,7 @@ class MessagingConfiguration {
                 password = "guest"
                 username = "guest"
             }.let { connectionFactory ->
-                Mono.fromCallable {
+                mono {
                     connectionFactory
                         .newConnection("reactor-rabbit")
                 }
@@ -37,9 +34,15 @@ class MessagingConfiguration {
             .connectionMono(connection)
             .let(RabbitFlux::createReceiver)
 
-    @Bean("rabbit-sender")
-    fun sender(connection: Mono<Connection?>?): Sender =
+    @Bean
+    fun sender(connection: Mono<Connection>): Sender =
         SenderOptions()
             .connectionMono(connection)
             .let(RabbitFlux::createSender)
+
+
 }
+
+val rec: Sender = TODO()
+
+val a = rec.declareQueue(QueueSpecification.queue())
