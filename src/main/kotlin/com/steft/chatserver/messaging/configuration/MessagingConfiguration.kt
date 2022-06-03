@@ -1,6 +1,5 @@
-package com.steft.chatserver.configuration
+package com.steft.chatserver.messaging.configuration
 
-import com.rabbitmq.client.Channel
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.reactor.mono
@@ -39,10 +38,4 @@ class MessagingConfiguration {
         SenderOptions()
             .connectionMono(connection)
             .let(RabbitFlux::createSender)
-
-
 }
-
-val rec: Sender = TODO()
-
-val a = rec.declareQueue(QueueSpecification.queue())

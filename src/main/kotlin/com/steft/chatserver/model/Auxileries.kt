@@ -1,6 +1,6 @@
 package com.steft.chatserver.model
 
-import com.steft.chatserver.service.serializer.UUIDSerializer
+import com.steft.chatserver.util.serde.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.UUID
 
@@ -14,8 +14,12 @@ value class UserId(val string: String)
 
 @Serializable
 @JvmInline
-value class MessageId(@Serializable(with = UUIDSerializer::class) val id: UUID)
+value class MessageId(
+    @Serializable(with = UUIDSerializer::class)
+    val id: UUID)
 
 @Serializable
 @JvmInline
-value class Serialized<T>(val data: ByteArray)
+value class Serialized<T>(val data: ByteArray) {
+    operator fun component1(): ByteArray = data
+}

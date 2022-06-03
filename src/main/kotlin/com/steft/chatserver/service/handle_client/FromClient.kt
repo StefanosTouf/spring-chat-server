@@ -1,9 +1,9 @@
-package com.steft.chatserver.service.tag
+package com.steft.chatserver.service.handle_client
 
-import com.steft.chatserver.model.Event
 import com.steft.chatserver.model.Serialized
 import com.steft.chatserver.model.UntaggedEvent
 import com.steft.chatserver.model.UserId
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 
-interface TagIncomingFlux: (UserId) -> (Flux<Serialized<UntaggedEvent>>) -> Flux<Event>
+interface FromClient : (UserId) -> (Flux<Serialized<UntaggedEvent>>) -> Mono<Void>

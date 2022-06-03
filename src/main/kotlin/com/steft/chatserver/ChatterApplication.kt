@@ -2,7 +2,6 @@
 
 package com.steft.chatserver
 
-import com.steft.chatserver.service.declare_connection.ConsumeEvents
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
@@ -26,7 +25,7 @@ class ChatterApplication
 @Configuration
 class WebsocketMappings {
     @Bean
-    fun webSocketHandlerMapping(handler: WebSocketHandler, declareConnection: ConsumeEvents): HandlerMapping =
+    fun webSocketHandlerMapping(handler: WebSocketHandler): HandlerMapping =
         SimpleUrlHandlerMapping(mapOf("/messages/*" to handler), 1)
 }
 
@@ -47,8 +46,7 @@ class ReactiveWebSocketHandler : WebSocketHandler {
                     .let { messages -> webSocketSession.send(messages) }
                     .and(webSocketSession
                         .receive()
-                        .map { it.payloadAsText }
-                        .map { println("Incoming $it") })
+                        .map { println("Incoming ${it.payloadAsText}") })
             }
 }
 
