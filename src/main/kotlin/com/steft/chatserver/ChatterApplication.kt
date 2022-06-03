@@ -2,7 +2,9 @@
 
 package com.steft.chatserver
 
+import com.steft.chatserver.messaging.configuration.MessagingProperties
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.runApplication
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -20,6 +22,7 @@ import java.time.Duration
 
 
 @SpringBootApplication
+@EnableConfigurationProperties(MessagingProperties::class)
 class ChatterApplication
 
 @Configuration

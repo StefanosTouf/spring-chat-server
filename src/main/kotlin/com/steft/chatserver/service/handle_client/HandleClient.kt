@@ -10,7 +10,7 @@ import org.springframework.web.reactive.socket.WebSocketSession
 import org.springframework.web.util.UriTemplate
 import reactor.core.publisher.Mono
 
-@Service
+//@Service
 class HandleClient(
     private val declareQueue: DeclareQueue,
     private val fromClient: FromClient,
@@ -27,19 +27,17 @@ class HandleClient(
         getId(session)
             ?.let { userId ->
                 declareQueue(userId)
-                    .then(
-                        toClient(userId)
-                            .map { session.textMessage(String(it.data)) }//TODO: ByteArray -> String is messy, fix it
-                            .let { session.send(it) }
-                            .and(
-                                session
-                                    .receive()
-                                    .map { message ->
-                                        Serialized<UntaggedEvent>(
-                                            message.payload
-                                                .asByteBuffer()
-                                                .array()) //TODO: DataBuffer -> ByteArray is messy, fix it
-                                    }.transform(fromClient(userId))))
+                    .then(toClient(userId)
+                        .map { session.textMessage(String(it.data)) }//TODO: ByteArray -> String is messy, fix it
+                        .let { session.send(it) }
+                        .and(session
+                            .receive()
+                            .map { message ->
+                                Serialized<UntaggedEvent>(
+                                    message.payload
+                                        .asByteBuffer()
+                                        .array()) //TODO: DataBuffer -> ByteArray is messy, fix it
+                            }.transform(fromClient(userId))))
             }
             ?: Mono.error(Exception("Invalid or nonexistent id parameter")) //TODO: Better error handling
 

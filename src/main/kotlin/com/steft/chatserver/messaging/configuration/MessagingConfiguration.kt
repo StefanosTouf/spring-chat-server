@@ -3,6 +3,7 @@ package com.steft.chatserver.messaging.configuration
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import kotlinx.coroutines.reactor.mono
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import reactor.core.publisher.Mono
@@ -12,16 +13,16 @@ import reactor.rabbitmq.*
 class MessagingConfiguration {
 
     @Bean
-    fun connectionFactory(): Mono<Connection> =
+    fun connectionFactory(configuration: MessagingProperties): Mono<Connection> =
         ConnectionFactory()
             .apply {
                 useNio()
-                host = "localhost"
-                port = 5672
-                password = "guest"
-                username = "guest"
+                host = configuration.host
+                port = configuration.port
+                password = configuration.password
+                username = configuration.username
             }.let { connectionFactory ->
-                mono {
+                Mono.fromCallable {
                     connectionFactory
                         .newConnection("reactor-rabbit")
                 }

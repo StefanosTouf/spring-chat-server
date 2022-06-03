@@ -31,6 +31,8 @@ dependencies {
 
     implementation("io.projectreactor.rabbitmq:reactor-rabbitmq:$reactorRabbitVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxVersion")
+
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
 
 tasks.withType<KotlinCompile> {
