@@ -13,5 +13,5 @@ class ConsumeEventsImpl(private val receiver: Receiver) : ConsumeEvents {
     override fun invoke(uid: UserId): Flux<Serialized<Event>> =
         receiver
             .consumeAutoAck(uid.string)
-            .map { Serialized(it.body) }
+            .map { Serialized(String(it.body)) }
 }

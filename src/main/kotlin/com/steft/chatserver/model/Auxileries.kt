@@ -20,6 +20,6 @@ value class MessageId(
 
 @Serializable
 @JvmInline
-value class Serialized<T>(val data: ByteArray) {
-    operator fun component1(): ByteArray = data
+value class Serialized<T>(val data: String) {
+    operator fun component1(): String = data
 }

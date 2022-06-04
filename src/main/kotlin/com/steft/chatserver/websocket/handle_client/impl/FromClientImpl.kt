@@ -1,12 +1,12 @@
 @file:Suppress("NestedLambdaShadowedImplicitParameter")
 
-package com.steft.chatserver.service.handle_client.impl
+package com.steft.chatserver.websocket.handle_client.impl
 
 import com.steft.chatserver.messaging.publish_events.PublishEvents
 import com.steft.chatserver.model.Serialized
 import com.steft.chatserver.model.UntaggedEvent
 import com.steft.chatserver.model.UserId
-import com.steft.chatserver.service.handle_client.FromClient
+import com.steft.chatserver.websocket.handle_client.FromClient
 import com.steft.chatserver.util.serde.deserialize.deserialize
 import com.steft.chatserver.util.serde.serialize.serialize
 import com.steft.chatserver.util.tag.tagEvent
@@ -26,7 +26,7 @@ class FromClientImpl(private val publishEvents: PublishEvents) : FromClient {
                         .let(tagEvent)
                         .let { serialize(it) }
                         .let { (data) ->
-                            OutboundMessage("", userId.string, data)
+                            OutboundMessage("", userId.string, data.encodeToByteArray())
                         }
                 }
                 .let { publishEvents(it) }

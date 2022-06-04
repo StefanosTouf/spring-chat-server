@@ -8,4 +8,4 @@ import kotlinx.serialization.json.Json
 
 inline fun <reified T> serialize(t: T): Serialized<T> =
     Json.encodeToString(t)
-        .let { Serialized(it.toByteArray()) }
+        .let { Serialized(it) }
