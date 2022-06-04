@@ -1,15 +1,17 @@
-package com.steft.chatserver.service.handle_client
+package com.steft.chatserver.websocket.handle_client
 
 import com.steft.chatserver.messaging.declare_queue.DeclareQueue
 import com.steft.chatserver.model.Serialized
 import com.steft.chatserver.model.UntaggedEvent
 import com.steft.chatserver.model.UserId
 import org.springframework.stereotype.Service
+import org.springframework.web.reactive.socket.CloseStatus
 import org.springframework.web.reactive.socket.WebSocketHandler
 import org.springframework.web.reactive.socket.WebSocketMessage
 import org.springframework.web.reactive.socket.WebSocketSession
 import org.springframework.web.util.UriTemplate
 import reactor.core.publisher.Mono
+import java.nio.charset.StandardCharsets
 
 @Service
 class HandleClient(
@@ -29,17 +31,22 @@ class HandleClient(
             ?.let { userId ->
                 declareQueue(userId)
                     .then(toClient(userId)
-                        .map { session.textMessage(String(it.data)) }
+                        .map { session.textMessage(it.data) }
                         .let(session::send)
                         .and(session
                             .receive()
                             .map { message ->
                                 message.payload
                                     .asByteBuffer()
-                                    .array()
-                                    .let { Serialized<UntaggedEvent>(it) }
-                            }.transform(fromClient(userId))))
+                                    .let(StandardCharsets.UTF_8::decode)
+                                    .let { println("Incoming message $it") }
+                                    .let { Serialized<UntaggedEvent>(it.toString()) }
+                            }
+                            .transform(fromClient(userId))))
+                    .doOnError { println("Error: $it") }
             }
-            ?: Mono.error(Exception("Invalid or nonexistent id parameter")) //TODO: Better error handling
+            ?: run {
+                session.close(CloseStatus.POLICY_VIOLATION)
+            }
 
 }

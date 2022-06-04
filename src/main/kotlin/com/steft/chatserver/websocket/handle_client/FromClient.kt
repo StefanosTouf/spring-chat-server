@@ -1,4 +1,4 @@
-package com.steft.chatserver.service.handle_client
+package com.steft.chatserver.websocket.handle_client
 
 import com.steft.chatserver.model.Serialized
 import com.steft.chatserver.model.UntaggedEvent
