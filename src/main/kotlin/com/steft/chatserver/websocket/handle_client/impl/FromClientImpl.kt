@@ -3,9 +3,7 @@
 package com.steft.chatserver.websocket.handle_client.impl
 
 import com.steft.chatserver.messaging.publish_events.PublishEvents
-import com.steft.chatserver.model.Serialized
-import com.steft.chatserver.model.UntaggedEvent
-import com.steft.chatserver.model.UserId
+import com.steft.chatserver.model.*
 import com.steft.chatserver.websocket.handle_client.FromClient
 import com.steft.chatserver.util.serde.deserialize.deserialize
 import com.steft.chatserver.util.serde.serialize.serialize
@@ -24,9 +22,23 @@ class FromClientImpl(private val publishEvents: PublishEvents) : FromClient {
                 .map { untagged ->
                     deserialize(untagged)
                         .let(tagEvent)
-                        .let { serialize(it) }
-                        .let { (data) ->
-                            OutboundMessage("", userId.string, data.encodeToByteArray())
+                        .let { event ->
+                            serialize(event)
+                                .let { (data) ->
+                                    when (event) {
+                                        is Message ->
+                                            OutboundMessage(
+                                                "",
+                                                event.to.string,
+                                                data.encodeToByteArray())
+                                        is Ack ->
+                                            OutboundMessage(
+                                                "",
+                                                event.to.string,
+                                                data.encodeToByteArray())
+                                    }
+
+                                }
                         }
                 }
                 .let { publishEvents(it) }
