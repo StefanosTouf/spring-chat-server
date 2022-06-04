@@ -39,7 +39,7 @@ class HandleClient(
                                 message.payload
                                     .asByteBuffer()
                                     .let(StandardCharsets.UTF_8::decode)
-                                    .let { println("Incoming message $it") }
+                                    .also { println("Incoming message $it") }
                                     .let { Serialized<UntaggedEvent>(it.toString()) }
                             }
                             .transform(fromClient(userId))))
