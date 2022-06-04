@@ -21,14 +21,3 @@ class ChatterApplication
 fun main(args: Array<String>) {
     runApplication<ChatterApplication>(*args)
 }
-
-//fun main() = runBlocking {
-////    UntaggedMessage(UserId("1"), "asdasdasd")
-////        .let { serialize<UntaggedEvent>(it) }
-////        .let { println(it) }
-//
-//    Serialized<UntaggedEvent>("{\"type\":\"MESSAGE\",\"to\":\"1\",\"body\":\"asdasdasd\"}")
-//        .let { deserialize(it) }
-//        .let { println(it) }
-//
-//}
