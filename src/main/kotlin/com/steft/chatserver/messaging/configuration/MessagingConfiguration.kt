@@ -2,8 +2,6 @@ package com.steft.chatserver.messaging.configuration
 
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
-import kotlinx.coroutines.reactor.mono
-import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import reactor.core.publisher.Mono
