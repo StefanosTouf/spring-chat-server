@@ -8,19 +8,24 @@ fun UntaggedEvent.Companion.tag(from: UserId): (UntaggedEvent) -> Event =
         when (untagged) {
             is UntaggedMessage ->
                 Message(
-                    MessageId(UUID.randomUUID()),
+                    EventId(UUID.randomUUID()),
                     from,
                     untagged.to,
                     untagged.body)
             is UntaggedAck ->
                 Ack(
-                    MessageId(UUID.randomUUID()),
+                    EventId(UUID.randomUUID()),
                     from,
                     untagged.to,
                     untagged.body)
             is UntaggedIsAlive ->
                 IsAlive(
-                    MessageId(UUID.randomUUID()),
+                    EventId(UUID.randomUUID()),
+                    from,
+                    untagged.to)
+            is UntaggedIsAliveAck ->
+                IsAliveAck(
+                    EventId(UUID.randomUUID()),
                     from,
                     untagged.to)
         }

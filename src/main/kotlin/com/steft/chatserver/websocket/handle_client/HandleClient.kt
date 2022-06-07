@@ -38,7 +38,7 @@ class HandleClient(
             ?.let { userId ->
                 declareQueue(userId)
                     .then(toClient(userId)
-                        .map { session.textMessage(it.data) }
+                        .map { (data) -> session.textMessage(data) }
                         .let(session::send)
                         .and(session
                             .receive()

@@ -9,4 +9,5 @@ data class MessagingProperties(
     val host: String,
     val port: Int,
     val password: String,
-    val username: String)
+    val username: String,
+    val messagingExchangeName: String)

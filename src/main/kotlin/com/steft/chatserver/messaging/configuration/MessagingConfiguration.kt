@@ -4,6 +4,7 @@ import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import reactor.core.Disposable
 import reactor.core.publisher.Mono
 import reactor.rabbitmq.*
 
@@ -37,4 +38,12 @@ class MessagingConfiguration {
         SenderOptions()
             .connectionMono(connection)
             .let(RabbitFlux::createSender)
+
+    @Bean
+    fun createMessagingExchange(configuration: MessagingProperties, sender: Sender): Disposable =
+        sender.declareExchange(
+            ExchangeSpecification()
+                .name(configuration.messagingExchangeName)
+                .type("topic"))
+            .subscribe()
 }

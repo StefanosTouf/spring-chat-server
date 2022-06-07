@@ -14,7 +14,7 @@ value class UserId(val string: String)
 
 @Serializable
 @JvmInline
-value class MessageId(
+value class EventId(
     @Serializable(with = UUIDSerializer::class)
     val id: UUID)
 
