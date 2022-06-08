@@ -1,6 +1,5 @@
-package com.steft.chatserver.websocket.handle_client
+package com.steft.chatserver.service.handle_client
 
-import com.steft.chatserver.messaging.declare_queue.DeclareQueue
 import com.steft.chatserver.model.Serialized
 import com.steft.chatserver.model.UntaggedEvent
 import com.steft.chatserver.model.UserId
@@ -15,7 +14,6 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class HandleClient(
-    private val declareQueue: DeclareQueue,
     private val fromClient: FromClient,
     private val toClient: ToClient) : WebSocketHandler {
 
@@ -36,14 +34,13 @@ class HandleClient(
     override fun handle(session: WebSocketSession): Mono<Void> =
         getId(session)
             ?.let { userId ->
-                declareQueue(userId)
-                    .then(toClient(userId)
-                        .map { (data) -> session.textMessage(data) }
-                        .let(session::send)
-                        .and(session
-                            .receive()
-                            .map(::messageToSerialized)
-                            .transform(fromClient(userId))))
+                toClient(userId)
+                    .map { (data) -> session.textMessage(data) }
+                    .let(session::send)
+                    .and(session
+                        .receive()
+                        .map(::messageToSerialized)
+                        .transform(fromClient(userId)))
                     .doOnError { println("Error: $it") }
             }
             ?: session.close(CloseStatus.POLICY_VIOLATION)
