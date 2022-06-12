@@ -24,11 +24,11 @@ class HandleClient(
                 ?.let { UserId(it) }
         }
 
-    private fun messageToSerialized(message: WebSocketMessage): Serialized<UntaggedEvent> =
+    private fun messageToSerialized(user: UserId, message: WebSocketMessage): Serialized<UntaggedEvent> =
         message.payload
             .asByteBuffer()
             .let(StandardCharsets.UTF_8::decode)
-            .also { println("Incoming message $it") }
+            .also { println("Incoming message from $user: $it") }
             .let { Serialized(it.toString()) }
 
     override fun handle(session: WebSocketSession): Mono<Void> =
@@ -39,7 +39,7 @@ class HandleClient(
                     .let(session::send)
                     .and(session
                         .receive()
-                        .map(::messageToSerialized)
+                        .map { messageToSerialized(userId, it) }
                         .transform(fromClient(userId)))
                     .doOnError { println("Error: $it") }
             }

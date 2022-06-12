@@ -29,6 +29,10 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
 
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.6.0")
+
     implementation("io.projectreactor.rabbitmq:reactor-rabbitmq:$reactorRabbitVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxVersion")
 
