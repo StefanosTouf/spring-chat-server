@@ -34,7 +34,10 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactive:1.6.0")
 
     implementation("io.projectreactor.rabbitmq:reactor-rabbitmq:$reactorRabbitVersion")
+
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxVersion")
+
+    implementation("org.springframework.boot:spring-boot-starter-data-redis-reactive")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 }
@@ -46,6 +49,6 @@ tasks.withType<KotlinCompile> {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
-}
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}
