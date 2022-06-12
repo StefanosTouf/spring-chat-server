@@ -23,3 +23,6 @@ value class EventId(
 value class Serialized<T>(val data: String) {
     operator fun component1(): String = data
 }
+
+@JvmInline
+value class RabbitQueue(val string: String)
