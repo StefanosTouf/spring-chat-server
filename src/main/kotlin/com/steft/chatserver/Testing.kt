@@ -180,29 +180,29 @@ val incomingMessages: Flux<Message> =
             Duration.ofMillis(500))
         .repeat()
 
-fun main() = runBlocking {
-    MessageRouter
-        .init(incomingMessages)
-        .doOnError { println(it) }
-        .subscribe()
-
-    MessageRouter
-        .listen(1)
-        .doOnNext { println("Client 1: $it") }
-        .take(Duration.ofMillis(2000))
-        .doOnError { println(it) }
-        .doOnComplete { println("Completed") }
-        .subscribe()
-
-    MessageRouter
-        .listen(2)
-        .doOnNext { println("Client 2: $it") }
-        .subscribe()
-
-    MessageRouter
-        .listen(5)
-        .doOnNext { println("Client 5: $it") }
-        .subscribe()
-
-    delay(100000000)
-}
+//fun main() = runBlocking {
+//    MessageRouter
+//        .init(incomingMessages)
+//        .doOnError { println(it) }
+//        .subscribe()
+//
+//    MessageRouter
+//        .listen(1)
+//        .doOnNext { println("Client 1: $it") }
+//        .take(Duration.ofMillis(2000))
+//        .doOnError { println(it) }
+//        .doOnComplete { println("Completed") }
+//        .subscribe()
+//
+//    MessageRouter
+//        .listen(2)
+//        .doOnNext { println("Client 2: $it") }
+//        .subscribe()
+//
+//    MessageRouter
+//        .listen(5)
+//        .doOnNext { println("Client 5: $it") }
+//        .subscribe()
+//
+//    delay(100000000)
+//}
