@@ -1,5 +1,6 @@
 package com.steft.chatserver.redis.configuration
 
+import com.steft.chatserver.model.OwnedRabbitQueue
 import com.steft.chatserver.model.RabbitQueue
 import com.steft.chatserver.model.UserId
 import org.springframework.context.annotation.Bean
@@ -13,9 +14,17 @@ import org.springframework.data.redis.serializer.RedisElementWriter
 import org.springframework.data.redis.serializer.RedisSerializationContext
 import org.springframework.data.redis.serializer.StringRedisSerializer
 import java.nio.ByteBuffer
+import java.util.UUID
 
 @Configuration
 class RedisConfiguration {
+
+    @Bean
+    fun ownedRabbitQueue(): OwnedRabbitQueue =
+        UUID.randomUUID()
+            .toString()
+            .let { RabbitQueue(it) }
+            .let { OwnedRabbitQueue(it) }
 
     @Bean
     fun stringOps(connectionFactory: ReactiveRedisConnectionFactory): ReactiveValueOperations<UserId, RabbitQueue> =

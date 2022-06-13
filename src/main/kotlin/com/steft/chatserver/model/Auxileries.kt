@@ -26,3 +26,6 @@ value class Serialized<T>(val data: String) {
 
 @JvmInline
 value class RabbitQueue(val string: String)
+
+@JvmInline
+value class OwnedRabbitQueue(val rabbitQueue: RabbitQueue)
