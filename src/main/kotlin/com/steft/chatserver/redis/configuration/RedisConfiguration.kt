@@ -19,12 +19,6 @@ import java.util.UUID
 @Configuration
 class RedisConfiguration {
 
-    @Bean
-    fun ownedRabbitQueue(): OwnedRabbitQueue =
-        UUID.randomUUID()
-            .toString()
-            .let { RabbitQueue(it) }
-            .let { OwnedRabbitQueue(it) }
 
     @Bean
     fun stringOps(connectionFactory: ReactiveRedisConnectionFactory): ReactiveValueOperations<UserId, RabbitQueue> =
