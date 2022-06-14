@@ -1,8 +1,10 @@
 package com.steft.chatserver.service.handle_client
 
+import com.steft.chatserver.model.IncomingEvents
 import com.steft.chatserver.model.Serialized
 import com.steft.chatserver.model.UntaggedEvent
 import com.steft.chatserver.model.UserId
+import com.steft.chatserver.util.serde.serialize.serialize
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.socket.CloseStatus
 import org.springframework.web.reactive.socket.WebSocketHandler
@@ -15,7 +17,7 @@ import java.nio.charset.StandardCharsets
 @Service
 class HandleClient(
     private val fromClient: FromClient,
-    private val toClient: ToClient) : WebSocketHandler {
+    private val incomingEvents: IncomingEvents) : WebSocketHandler {
 
     private fun getId(session: WebSocketSession): UserId? =
         with(UriTemplate("/messages/{id}")) {
@@ -34,8 +36,14 @@ class HandleClient(
     override fun handle(session: WebSocketSession): Mono<Void> =
         getId(session)
             ?.let { userId ->
-                toClient(userId)
-                    .map { (data) -> session.textMessage(data) }
+                incomingEvents
+                    .events
+                    .filter { it.untagged.to == userId }
+                    .map { event ->
+                        serialize(event)
+                            .data
+                            .let(session::textMessage)
+                    }
                     .let(session::send)
                     .and(session
                         .receive()

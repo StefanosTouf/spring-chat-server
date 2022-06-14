@@ -8,3 +8,7 @@ inline fun <reified T> deserialize(serialized: Serialized<T>): T =
     serialized.let { (data) ->
         Json.decodeFromString(data)
     }
+
+inline fun <reified T> deserialize(serialized: String): T =
+    Json.decodeFromString(serialized)
+

@@ -30,11 +30,10 @@ class FromClientImpl(
 
     override fun invoke(from: UserId): (Flux<Serialized<UntaggedEvent>>) -> Mono<Void> =
         { incoming ->
-            val tag = UntaggedEvent.tag(from)
             incoming
                 .map { untagged ->
                     deserialize(untagged)
-                        .let(tag)
+                        .let(UntaggedEvent.tag(from))
                         .let { event ->
                             val to = event.untagged.to.string
                             val bytes = serialize(event).data.encodeToByteArray()

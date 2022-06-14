@@ -8,7 +8,9 @@ import org.springframework.web.reactive.socket.WebSocketHandler
 
 @Configuration
 class WebsocketMappings {
+
     @Bean
     fun webSocketHandlerMapping(handler: WebSocketHandler): HandlerMapping =
         SimpleUrlHandlerMapping(mapOf("/messages/*" to handler), 1)
+
 }
