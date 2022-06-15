@@ -11,12 +11,12 @@ import reactor.core.publisher.Mono
 
 @Service
 class RegisterUserImpl(
-    private val redisOps: ReactiveValueOperations<UserId, RabbitQueue>,
+    private val redisOps: ReactiveValueOperations<String, String>,
     private val ownedRabbitQueue: OwnedRabbitQueue) : RegisterUser {
 
     override fun invoke(user: UserId): Mono<Unit> =
         redisOps
-            .set(user, ownedRabbitQueue.rabbitQueue)
+            .set(user.string, ownedRabbitQueue.rabbitQueue.string)
             .flatMap { isSuccessful ->
                 if (isSuccessful)
                     Mono.just(Unit)

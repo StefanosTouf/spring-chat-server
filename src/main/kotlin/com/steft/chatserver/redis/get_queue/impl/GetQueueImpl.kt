@@ -9,9 +9,11 @@ import reactor.core.publisher.Mono
 
 @Service
 class GetQueueImpl(
-    private val redisOps: ReactiveValueOperations<UserId, RabbitQueue>) : GetQueue {
+    private val redisOps: ReactiveValueOperations<String, String>) : GetQueue {
 
     override fun invoke(user: UserId): Mono<RabbitQueue> =
-        redisOps.get(user)
+        redisOps
+            .get(user.string)
+            .map { RabbitQueue(it) }
 
 }
