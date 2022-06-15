@@ -7,6 +7,7 @@ import com.steft.chatserver.service.route_events.RouteEvents
 import com.steft.chatserver.util.serde.deserialize.deserialize
 import com.steft.chatserver.util.serde.serialize.serialize
 import com.steft.chatserver.util.tag.tag
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.socket.CloseStatus
 import org.springframework.web.reactive.socket.WebSocketHandler
@@ -22,6 +23,8 @@ class HandleClient(
     private val registerUser: RegisterUser,
     private val routeEvents: RouteEvents,
     private val eventsOfClient: EventsOfClient) : WebSocketHandler {
+
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     private fun getId(session: WebSocketSession): UserId? =
         with(UriTemplate("/messages/{id}")) {
@@ -62,20 +65,16 @@ class HandleClient(
             ?.let { userId ->
                 registerUser(userId)
                     .then(eventsOfClient(userId)
+                        .doOnNext { log.info("Sending $it") }
                         .transform(toWebsocketMessage(session))
                         .let(session::send)
                         .and(session
                             .receive()
                             .transform(toEvent(userId))
+                            .doOnNext { log.info("Received $it") }
                             .transform(routeEvents))
-                        .doOnError { println("Error: $it") })
+                        .doOnError { log.warn(it.toString()) })
             }
             ?: session.close(CloseStatus.POLICY_VIOLATION)
 
 }
-
-//fun main() {
-//    deserialize<UntaggedEvent>(
-//        "{\"to\": \"1\", \"type\": \"MESSAGE\", \"body\": \"AADDAADADDADA\" }")
-//        .let { println(it) }
-//}

@@ -7,6 +7,7 @@ import com.steft.chatserver.model.UserId
 import com.steft.chatserver.redis.get_queue.GetQueue
 import com.steft.chatserver.service.route_events.RouteEvents
 import com.steft.chatserver.util.serde.serialize.serialize
+import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -19,6 +20,8 @@ class RouteEventsImpl(
     private val messagingProperties: MessagingProperties,
     private val sender: Sender,
     private val getQueue: GetQueue) : RouteEvents {
+
+    private val log = LoggerFactory.getLogger(this::class.java)
 
     private fun toOutbound(queue: RabbitQueue): (Event) -> OutboundMessage = { event ->
         serialize(event)
@@ -45,7 +48,7 @@ class RouteEventsImpl(
                             .let(sender::send)
                     }
                     .timeout(Duration.ofMillis(10000), Mono.empty())
-                    .doOnComplete { println("Timeout group ${events.key()}") }
+                    .doOnComplete { log.info("Timeout group ${events.key()}") }
             }
 
 }
