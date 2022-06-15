@@ -32,30 +32,48 @@ class MessagingConfiguration {
             }.cache()
 
     @Bean
-    fun receiver(
-        ownedRabbitQueue: OwnedRabbitQueue,
-        connection: Mono<Connection>): IncomingEvents =
-        ReceiverOptions()
-            .connectionMono(connection)
-            .let(RabbitFlux::createReceiver)
-            .consumeAutoAck(ownedRabbitQueue.rabbitQueue.string)
-            .map { deserialize<Event>(String(it.body)) }
-            .share()
-            .let { IncomingEvents(it) }
-
-    @Bean
     fun sender(connection: Mono<Connection>): Sender =
         SenderOptions()
             .connectionMono(connection)
             .let(RabbitFlux::createSender)
 
     @Bean
-    fun createMessagingExchange(configuration: MessagingProperties, sender: Sender): Disposable =
-        sender.declareExchange(
-            ExchangeSpecification()
-                .name(configuration.messagingExchangeName)
-                .type("topic"))
+    fun createMessagingExchange(
+        configuration: MessagingProperties,
+        sender: Sender): Disposable =
+        sender
+            .declareExchange(
+                ExchangeSpecification()
+                    .name(configuration.messagingExchangeName)
+                    .type("direct"))
             .subscribe()
+
+    @Bean
+    fun receiver(
+        configuration: MessagingProperties,
+        sender: Sender,
+        ownedRabbitQueue: OwnedRabbitQueue,
+        connection: Mono<Connection>): IncomingEvents =
+        QueueSpecification()
+            .exclusive(true)
+            .let(sender::declareQueue)
+            .flatMap { declareOk ->
+                BindingSpecification()
+                    .queue(declareOk.queue)
+                    .routingKey(ownedRabbitQueue.rabbitQueue.string)
+                    .exchange(configuration.messagingExchangeName)
+                    .let(sender::bind)
+                    .thenReturn(declareOk)
+            }
+            .flatMapMany { declareOk ->
+                ReceiverOptions()
+                    .connectionMono(connection)
+                    .let(RabbitFlux::createReceiver)
+                    .consumeAutoAck(declareOk.queue)
+                    .map { Serialized<Event>(String(it.body)) }
+
+            }.let { IncomingEvents(it) }
+
 
     @Bean
     fun ownedRabbitQueue(): OwnedRabbitQueue =
