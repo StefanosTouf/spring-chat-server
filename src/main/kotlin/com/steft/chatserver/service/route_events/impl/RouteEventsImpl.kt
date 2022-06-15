@@ -3,8 +3,7 @@ package com.steft.chatserver.service.route_events.impl
 import com.steft.chatserver.messaging.configuration.MessagingProperties
 import com.steft.chatserver.model.Event
 import com.steft.chatserver.model.RabbitQueue
-import com.steft.chatserver.model.UserId
-import com.steft.chatserver.redis.get_queue.GetQueue
+import com.steft.chatserver.service.get_queue.GetQueue
 import com.steft.chatserver.service.route_events.RouteEvents
 import com.steft.chatserver.util.serde.serialize.serialize
 import org.slf4j.LoggerFactory
@@ -52,33 +51,3 @@ class RouteEventsImpl(
             }
 
 }
-
-
-//fun main() = runBlocking {
-//
-////    sender.sendWithPublishConfirms(outboundMessage).expand { a ->
-////        sender.sendWithPublishConfirms(a.outboundMessage)
-////    }
-//
-//    flux {
-//        while (true) {
-//            delay(10); send(Random.nextInt(3))
-//        }
-//    }
-//        .groupBy { it }
-//        .flatMap { g ->
-//            Mono.just(1)
-//                .doOnNext { println("First") }
-//                .thenMany(g)
-//                .flatMap {
-////                    sender.sendWithPublishConfirms()
-//                    mono { it }
-//                }
-//                .timeout(Duration.ofMillis(10000), Mono.empty())
-//                .doOnComplete { println("Cancelled group ${g.key()}") }
-//        }
-//        .doOnNext { println(it) }
-//        .subscribe()
-//
-//    delay(1000000)
-//}

@@ -1,7 +1,7 @@
 package com.steft.chatserver.service.handle_client
 
 import com.steft.chatserver.model.*
-import com.steft.chatserver.redis.register_user.RegisterUser
+import com.steft.chatserver.service.register_user.RegisterUser
 import com.steft.chatserver.service.events_of_client.EventsOfClient
 import com.steft.chatserver.service.route_events.RouteEvents
 import com.steft.chatserver.util.serde.deserialize.deserialize
