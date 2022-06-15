@@ -1,4 +1,4 @@
-package com.steft.chatserver.redis.register_user
+package com.steft.chatserver.service.register_user
 
 import com.steft.chatserver.model.UserId
 import reactor.core.publisher.Mono
