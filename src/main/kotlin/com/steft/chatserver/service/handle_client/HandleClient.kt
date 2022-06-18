@@ -1,6 +1,7 @@
 package com.steft.chatserver.service.handle_client
 
 import com.steft.chatserver.model.*
+import com.steft.chatserver.service.control_interceptor.ControlInterceptor
 import com.steft.chatserver.service.register_user.RegisterUser
 import com.steft.chatserver.service.events_of_client.EventsOfClient
 import com.steft.chatserver.service.route_events.RouteEvents
@@ -20,6 +21,7 @@ import java.nio.charset.StandardCharsets
 
 @Service
 class HandleClient(
+    private val controlInterceptor: ControlInterceptor,
     private val registerUser: RegisterUser,
     private val routeEvents: RouteEvents,
     private val eventsOfClient: EventsOfClient) : WebSocketHandler {
@@ -33,7 +35,7 @@ class HandleClient(
                 ?.let { UserId(it) }
         }
 
-    private fun toEvent(userId: UserId): (Flux<WebSocketMessage>) -> Flux<Event> =
+    private fun toEvent(userId: UserId): (Flux<WebSocketMessage>) -> Flux<Event.Message> =
         { messages ->
             messages
                 .map {
@@ -44,17 +46,17 @@ class HandleClient(
                 }
                 .flatMap { message ->
                     Mono.fromCallable {
-                        deserialize<UntaggedEvent>(message)
+                        deserialize<UntaggedMessage>(message)
                     }
                 }
-                .map(UntaggedEvent.tag(userId))
+                .map(UntaggedMessage.tag(userId))
         }
 
-    private fun toWebsocketMessage(session: WebSocketSession): (Flux<Event>) -> Flux<WebSocketMessage> =
+    private fun toWebsocketMessage(session: WebSocketSession): (Flux<Event.Message>) -> Flux<WebSocketMessage> =
         { events ->
             events
                 .map { event ->
-                    serialize<Event>(event)
+                    serialize<Event.Message>(event)
                         .data
                         .let(session::textMessage)
                 }
@@ -63,15 +65,19 @@ class HandleClient(
     override fun handle(session: WebSocketSession): Mono<Void> =
         getId(session)
             ?.let { userId ->
+                val f = session
+                    .receive()
+                    .transform(toEvent(userId))
+
+                val t = eventsOfClient(userId)
+
+                val (fromClient, toClient) = controlInterceptor(f, t)
+
                 registerUser(userId)
-                    .then(eventsOfClient(userId)
-                        .doOnNext { log.info("Sending $it") }
+                    .then(toClient
                         .transform(toWebsocketMessage(session))
                         .let(session::send)
-                        .and(session
-                            .receive()
-                            .transform(toEvent(userId))
-                            .doOnNext { log.info("Received $it") }
+                        .and(fromClient
                             .transform(routeEvents))
                         .doOnError { log.warn(it.toString()) })
             }

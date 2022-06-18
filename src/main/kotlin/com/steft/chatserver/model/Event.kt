@@ -4,24 +4,34 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Event(
-    val eventId: EventId,
-    val from: UserId,
-    val untagged: UntaggedEvent)
+enum class Response {
+    NEGATIVE, POSITIVE
+}
 
 @Serializable
-sealed class UntaggedEvent {
+sealed class Event {
+    abstract val eventId: EventId
     abstract val to: UserId
-
-    @Serializable
-    @SerialName("MESSAGE")
-    data class UntaggedMessage(
-        override val to: UserId,
-        val body: String) : UntaggedEvent()
+    abstract val from: UserId
 
     @Serializable
     @SerialName("ACK")
-    data class UntaggedAck(
+    data class Ack(
+        override val eventId: EventId,
         override val to: UserId,
-        val body: EventId) : UntaggedEvent()
+        override val from: UserId,
+        val body: EventId) : Event()
+
+    @Serializable
+    @SerialName("MESSAGE")
+    data class Message(
+        override val eventId: EventId,
+        override val to: UserId,
+        override val from: UserId,
+        val body: String) : Event()
 }
+
+@Serializable
+data class UntaggedMessage(
+    val to: UserId,
+    val body: String)

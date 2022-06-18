@@ -36,7 +36,7 @@ class RouteEventsImpl(
 
     override fun invoke(incoming: Flux<Event>): Flux<Void> =
         incoming
-            .groupBy { it.untagged.to }
+            .groupBy { it.to }
             .flatMap { events ->
                 events
                     .key()

@@ -24,6 +24,6 @@ class EventsOfClientImpl(incomingEvents: IncomingEvents) : EventsOfClient {
 
     override fun invoke(user: UserId): Flux<Event> =
         sharedEvents
-            .filter { it.untagged.to == user }
+            .filter { it.to == user }
 
 }

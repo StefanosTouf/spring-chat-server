@@ -1,0 +1,83 @@
+@file:Suppress("NAME_SHADOWING")
+
+package com.steft.chatserver.service.control_interceptor.impl
+
+import com.steft.chatserver.model.Event
+import com.steft.chatserver.model.EventId
+import com.steft.chatserver.service.control_interceptor.ControlInterceptor
+import org.springframework.stereotype.Service
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import java.time.Duration
+import java.util.Vector
+
+@Service
+class ControlInterceptorImpl : ControlInterceptor {
+
+    private val retries = 3
+
+    private fun Flux<Event>.filterMessages(): Flux<Event.Message> =
+        flatMap {
+            if (it is Event.Message)
+                Mono.just(it)
+            else
+                Mono.empty()
+        }
+
+    override fun invoke(
+        fromClient: Flux<Event.Message>,
+        toClient: Flux<Event>): Pair<Flux<Event.Message>, Flux<Event.Message>> =
+
+        toClient
+            .publish()
+            .refCount(2)
+            .let { toClient ->
+
+                fromClient
+                    .publish()
+                    .refCount(2)
+                    .let { fromClient ->
+
+                        val maps: List<Map<EventId, Event.Message>> =
+                            MutableList<Map<EventId, Event.Message>>(retries) {
+                                HashMap()
+                            }
+
+                        val toResend =
+                            toClient
+                                .filter { it !is Event.Message }
+                                .mergeWith(fromClient)
+                                .buffer(Duration.ofMillis(1000))
+                                .scan(maps) { maps, events ->
+                                    val shiftedMaps =
+                                        maps.drop(1)
+                                            .plus(HashMap())
+
+                                    events.fold(shiftedMaps) { maps, event ->
+                                        when (event) {
+                                            is Event.Ack ->
+                                                maps.map { it.minus(event.eventId) }
+
+                                            is Event.Message ->
+                                                maps.mapIndexed { index, map ->
+                                                    if (index == maps.lastIndex)
+                                                        map.plus(event.eventId to event)
+                                                    else
+                                                        map
+                                                }
+
+                                        }
+                                    }
+                                }
+                                .sample(Duration.ofMillis(1000))
+                                .flatMapIterable { it.asIterable().flatMap { it.asIterable() } }
+                                .map { it.value }
+
+                        toClient.filterMessages() to fromClient.mergeWith(toResend)
+
+                    }
+
+            }
+
+
+}
