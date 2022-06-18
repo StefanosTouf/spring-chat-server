@@ -2,6 +2,7 @@ package com.steft.chatserver.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.util.UUID
 
 @Serializable
 enum class Response {
@@ -17,7 +18,7 @@ sealed class Event {
     @Serializable
     @SerialName("ACK")
     data class Ack(
-        override val eventId: EventId,
+        override val eventId: EventId = EventId(UUID.randomUUID()),
         override val to: UserId,
         override val from: UserId,
         val body: EventId) : Event()
@@ -25,7 +26,7 @@ sealed class Event {
     @Serializable
     @SerialName("MESSAGE")
     data class Message(
-        override val eventId: EventId,
+        override val eventId: EventId = EventId(UUID.randomUUID()),
         override val to: UserId,
         override val from: UserId,
         val body: String) : Event()

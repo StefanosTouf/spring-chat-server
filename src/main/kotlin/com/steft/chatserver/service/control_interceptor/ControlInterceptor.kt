@@ -5,4 +5,4 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 
 /*fromClient, toClient*/
-interface ControlInterceptor : (Flux<Event.Message>, Flux<Event>) -> Pair<Flux<Event.Message>, Flux<Event.Message>>
+interface ControlInterceptor : (Flux<Event.Message>, Flux<Event>) -> Pair<Flux<Event>, Flux<Event.Message>>

@@ -62,6 +62,7 @@ class HandleClient(
                 }
         }
 
+    val a: (Flux<Event.Message>) -> Flux<Void> = TODO()
     override fun handle(session: WebSocketSession): Mono<Void> =
         getId(session)
             ?.let { userId ->
@@ -73,12 +74,13 @@ class HandleClient(
 
                 val (fromClient, toClient) = controlInterceptor(f, t)
 
+
                 registerUser(userId)
                     .then(toClient
                         .transform(toWebsocketMessage(session))
                         .let(session::send)
                         .and(fromClient
-                            .transform(routeEvents))
+                            .transform(a)) /*routeEvents*/
                         .doOnError { log.warn(it.toString()) })
             }
             ?: session.close(CloseStatus.POLICY_VIOLATION)

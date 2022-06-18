@@ -5,11 +5,14 @@ package com.steft.chatserver.service.control_interceptor.impl
 import com.steft.chatserver.model.Event
 import com.steft.chatserver.model.EventId
 import com.steft.chatserver.service.control_interceptor.ControlInterceptor
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import java.time.Duration
-import java.util.Vector
+import java.util.EventListener
+import java.util.UUID
 
 @Service
 class ControlInterceptorImpl : ControlInterceptor {
@@ -57,7 +60,16 @@ class ControlInterceptorImpl : ControlInterceptor {
 
     override fun invoke(
         fromClient: Flux<Event.Message>,
-        toClient: Flux<Event>): Pair<Flux<Event.Message>, Flux<Event.Message>> =
+        toClient: Flux<Event>): Pair<Flux<Event>, Flux<Event.Message>> = run {
+
+        val acks =
+            toClient.filter { it is Event.Message }
+                .map {
+                    Event.Ack(
+                        from = it.from,
+                        to = it.to,
+                        body = it.eventId)
+                }
 
         toClient
             .filter { it !is Event.Message }
@@ -66,9 +78,32 @@ class ControlInterceptorImpl : ControlInterceptor {
                 outputNonAcknowledgedOnInterval(
                     Duration.ofMillis(2000)))
             .let { toResend ->
-                toClient.filterMessages() to
-                        fromClient.mergeWith(toResend)
+                Pair(
+                    fromClient
+                        .map<Event> { it }
+                        .mergeWith(toResend)
+                        .mergeWith(acks),
+                    toClient
+                        .filterMessages())
             }
+    }
 
 }
 
+fun main() = runBlocking {
+
+    val fl = Flux.just(1, 2, 3, 4, 5, 6).delayElements(Duration.ofMillis(50))
+
+    fl.filter { it % 2 == 0 }
+        .doOnNext(::println)
+        .subscribe()
+
+    delay(2000)
+
+    fl.filter { it % 2 != 0 }
+        .doOnNext(::println)
+        .subscribe()
+
+
+    delay(200000)
+}
