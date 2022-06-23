@@ -25,6 +25,7 @@ class HandleClient(
 
     override fun handle(session: WebSocketSession): Mono<Void> =
         getId(session)
+            ?.also { log.info("Connection from user $it") }
             ?.let { userId ->
                 integration(
                     userId,
