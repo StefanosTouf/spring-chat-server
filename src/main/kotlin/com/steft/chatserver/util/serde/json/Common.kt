@@ -1,4 +1,4 @@
-package com.steft.chatserver.util.serde
+package com.steft.chatserver.util.serde.json
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
