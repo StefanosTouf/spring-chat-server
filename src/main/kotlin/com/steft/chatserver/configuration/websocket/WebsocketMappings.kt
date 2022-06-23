@@ -1,4 +1,4 @@
-package com.steft.chatserver.service.configuration
+package com.steft.chatserver.configuration.websocket
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
