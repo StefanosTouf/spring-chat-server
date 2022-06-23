@@ -1,6 +1,6 @@
 package com.steft.chatserver.model
 
-import com.steft.chatserver.util.serde.UUIDSerializer
+import com.steft.chatserver.util.serde.json.UUIDSerializer
 import kotlinx.serialization.Serializable
 import java.util.*
 
