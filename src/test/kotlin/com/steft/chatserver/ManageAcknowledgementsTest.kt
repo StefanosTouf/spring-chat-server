@@ -8,6 +8,7 @@ import com.steft.chatserver.model.UserId
 import com.steft.chatserver.service.events_of_client.EventsOfClient
 import com.steft.chatserver.service.manage_acknowledgements.AcknowledgementProperties
 import com.steft.chatserver.service.manage_acknowledgements.ManageAcknowledgements
+import com.steft.chatserver.service.manage_acknowledgements.impl.ManageAcknowledgementsImpl
 import com.steft.chatserver.service.redis.get_queue.GetQueue
 import com.steft.chatserver.service.redis.register_user.RegisterUser
 import com.steft.chatserver.service.route_events.RouteEvents
@@ -18,6 +19,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.test.StepVerifier
+import java.time.Duration
 import java.util.UUID
 
 @SpringBootTest
@@ -41,12 +43,20 @@ class ManageAcknowledgementsTest {
     @MockBean
     private lateinit var mre: RouteEvents
 
-    @Autowired
-    private lateinit var manageAcknowledgements: ManageAcknowledgements
+    @MockBean
+    private lateinit var ma: ManageAcknowledgements
 
-    @Autowired
-    private lateinit var acknowledgementProperties: AcknowledgementProperties
+    @MockBean
+    private lateinit var ap: AcknowledgementProperties
 
+    private val acknowledgementProperties: AcknowledgementProperties =
+        AcknowledgementProperties(
+            3,
+            Duration.ofMillis(2000),
+            Duration.ofMillis(200))
+
+    private val manageAcknowledgements: ManageAcknowledgements =
+        ManageAcknowledgementsImpl(acknowledgementProperties)
     // Assumes retries are set to >= 2
 
     private fun createMessageAndAck(sender: UserId, receiver: UserId): (String) -> Pair<Event.Message, Event.Ack> =
