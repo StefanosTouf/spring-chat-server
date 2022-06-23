@@ -1,4 +1,4 @@
-package com.steft.chatserver.messaging.configuration
+package com.steft.chatserver.configuration.messaging
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding

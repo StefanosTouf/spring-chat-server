@@ -1,19 +1,24 @@
-package com.steft.chatserver.messaging.configuration
+package com.steft.chatserver.configuration.messaging
 
 import com.rabbitmq.client.Connection
 import com.rabbitmq.client.ConnectionFactory
 import com.steft.chatserver.model.*
-import com.steft.chatserver.util.serde.deserialize.deserialize
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import reactor.core.Disposable
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.rabbitmq.*
 import java.util.*
 
 @Configuration
 class MessagingConfiguration {
+
+    @Bean
+    fun ownedRabbitQueue(): OwnedRabbitQueue =
+        UUID.randomUUID()
+            .toString()
+            .let { RabbitQueue(it) }
+            .let { OwnedRabbitQueue(it) }
 
     @Bean
     fun connectionFactory(configuration: MessagingProperties): Mono<Connection> =
@@ -74,12 +79,5 @@ class MessagingConfiguration {
 
             }.let { IncomingEvents(it) }
 
-
-    @Bean
-    fun ownedRabbitQueue(): OwnedRabbitQueue =
-        UUID.randomUUID()
-            .toString()
-            .let { RabbitQueue(it) }
-            .let { OwnedRabbitQueue(it) }
 
 }
