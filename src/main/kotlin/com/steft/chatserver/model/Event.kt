@@ -5,11 +5,6 @@ import kotlinx.serialization.Serializable
 import java.util.UUID
 
 @Serializable
-enum class Response {
-    NEGATIVE, POSITIVE
-}
-
-@Serializable
 sealed class Event {
     abstract val eventId: EventId
     abstract val to: UserId
@@ -31,8 +26,3 @@ sealed class Event {
         override val from: UserId,
         val body: String) : Event()
 }
-
-@Serializable
-data class UntaggedMessage(
-    val to: UserId,
-    val body: String)
