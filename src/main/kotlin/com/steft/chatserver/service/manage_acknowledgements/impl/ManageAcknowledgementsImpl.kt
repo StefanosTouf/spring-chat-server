@@ -92,21 +92,32 @@ class ManageAcknowledgementsImpl(
             }
     }
 
-    private fun <T> duplicate(t: T) = t to t
+    private fun <T> duplicate(flux: Flux<T>) =
+        flux.publish()
+            .refCount(2)
+            .let { it to it }
 
     override fun invoke(
         fromClient: Flux<Event.Message>,
         toClient: Flux<Event>): Pair<Flux<Event>, Flux<Event>> = run {
 
-        val (controlMessagesFromClient, messagesFromClient) = duplicate(fromClient)
+        val (controlMessagesFromClient, messagesFromClient) =
+            duplicate(fromClient)
 
-        val (controlEventsToClient, eventsToClient) = duplicate(toClient)
+        val (controlEventsToClient, eventsToClient) =
+            duplicate(toClient)
 
-        val (controlMessagesToClient, controlAcksToClient) = splitMessagesAndAcks(controlEventsToClient)
+        val (controlMessagesToClient, controlAcksToClient) =
+            splitMessagesAndAcks(controlEventsToClient)
 
-        val nonAcknowledgedFromClient = outputNonAcknowledgedOnInterval(controlMessagesFromClient, controlAcksToClient)
+        val nonAcknowledgedFromClient =
+            outputNonAcknowledgedOnInterval(
+                controlMessagesFromClient,
+                controlAcksToClient)
 
-        val acksFromClient = controlMessagesToClient.transform(::acknowledgeMessages)
+        val acksFromClient =
+            controlMessagesToClient
+                .transform(::acknowledgeMessages)
 
         val eventsFromClient =
             Flux.merge(
@@ -115,6 +126,7 @@ class ManageAcknowledgementsImpl(
                 acksFromClient)
 
         eventsFromClient to eventsToClient
+
     }
 }
 
