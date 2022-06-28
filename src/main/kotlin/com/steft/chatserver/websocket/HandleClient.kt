@@ -1,6 +1,6 @@
 package com.steft.chatserver.websocket
 
-import com.steft.chatserver.integration.Integration
+import com.steft.chatserver.service.integration.Integration
 import com.steft.chatserver.model.*
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service

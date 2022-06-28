@@ -1,11 +1,11 @@
 package com.steft.chatserver
 
 import com.steft.chatserver.configuration.messaging.MessagingConfiguration
-import com.steft.chatserver.integration.Integrator
 import com.steft.chatserver.model.Event
 import com.steft.chatserver.model.EventId
 import com.steft.chatserver.model.UserId
 import com.steft.chatserver.service.events_of_client.EventsOfClient
+import com.steft.chatserver.service.integration.Integration
 import com.steft.chatserver.service.manage_acknowledgements.AcknowledgementProperties
 import com.steft.chatserver.service.manage_acknowledgements.ManageAcknowledgements
 import com.steft.chatserver.service.manage_acknowledgements.impl.ManageAcknowledgementsImpl
@@ -13,7 +13,6 @@ import com.steft.chatserver.service.redis.get_queue.GetQueue
 import com.steft.chatserver.service.redis.register_user.RegisterUser
 import com.steft.chatserver.service.route_events.RouteEvents
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import reactor.core.publisher.Flux
@@ -35,7 +34,7 @@ class ManageAcknowledgementsTest {
     private lateinit var mg: GetQueue
 
     @MockBean
-    private lateinit var mi: Integrator
+    private lateinit var mi: Integration
 
     @MockBean
     private lateinit var me: EventsOfClient
