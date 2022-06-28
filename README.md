@@ -1,4 +1,4 @@
-A chatting service that might become the subject of my thesis. My goal is to achieve the highest possible throughput and resiliency.
+A chatting service that might become the subject of my thesis. My goal is to achieve the highest possible throughput and resiliency. Its very much in progress and not near finished.
 
 **It uses the following technologies:**
 * RabbitMQ
